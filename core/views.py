@@ -94,97 +94,98 @@ def home_screen(request):
 
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ###------------------------------------------------------------------------------------------------------------------------------------------------------------------
+###------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-from django.shortcuts import render, get_object_or_404
-from .models import Book
-from django.http import FileResponse
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.template import Template, Context
+# from django.shortcuts import render, get_object_or_404
+# from .models import Book
+# from django.http import FileResponse
+# from django.contrib.auth.decorators import login_required
+# from django.http import HttpResponse
+# from django.template import Template, Context
 
-@login_required
-def student_book_list(request):
-    if hasattr(request.user, 'is_student') and request.user.is_student:
-        books = Book.objects.all()
+# @login_required
+# def student_book_list(request):
+#     if hasattr(request.user, 'is_student') and request.user.is_student:
+#         books = Book.objects.all()
 
-        html_string = """
-        <!DOCTYPE html>
-        <html>
-        <head><title>Book Library</title></head>
-        <body>
-            <h2>Welcome Student!</h2>
-            <ul>
-                {% for book in books %}
-                    <li>
-                        <strong>{{ book.title }}</strong> by {{ book.author }}
-                        {% if book.file %}
-                            - <a href="/api/student/book/{{ book.id }}/download/">Download</a>
-                        {% else %}
-                            - No file available
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </body>
-        </html>
-        """
+#         html_string = """
+#         <!DOCTYPE html>
+#         <html>
+#         <head><title>Book Library</title></head>
+#         <body>
+#             <h2>Welcome Student!</h2>
+#             <ul>
+#                 {% for book in books %}
+#                     <li>
+#                         <strong>{{ book.title }}</strong> by {{ book.author }}
+#                         {% if book.file %}
+#                             - <a href="/api/student/book/{{ book.id }}/download/">Download</a>
+#                         {% else %}
+#                             - No file available
+#                         {% endif %}
+#                     </li>
+#                 {% endfor %}
+#             </ul>
+#         </body>
+#         </html>
+#         """
 
-        template = Template(html_string)
-        context = Context({'books': books})
-        return HttpResponse(template.render(context))
-    else:
-        return render(request, 'unauthorized.html')
-
-
-@login_required
-def student_download_book(request, book_id):
-    if hasattr(request.user, 'is_student') and request.user.is_student:
-        book = get_object_or_404(Book, id=book_id)
-        return FileResponse(book.file.open('rb'), as_attachment=True)
-    else:
-        return render(request, 'unauthorized.html')
+#         template = Template(html_string)
+#         context = Context({'books': books})
+#         return HttpResponse(template.render(context))
+#     else:
+#         return render(request, 'unauthorized.html')
 
 
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.template import Template, Context
-from django.middleware.csrf import get_token
+# @login_required
+# def student_download_book(request, book_id):
+#     if hasattr(request.user, 'is_student') and request.user.is_student:
+#         book = get_object_or_404(Book, id=book_id)
+#         return FileResponse(book.file.open('rb'), as_attachment=True)
+#     else:
+#         return render(request, 'unauthorized.html')
 
-def custom_login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            next_url = request.GET.get('next', '/')
-            return redirect(next_url)
-        else:
-            error_message = "Invalid username or password"
-    else:
-        error_message = None
+# from django.contrib.auth import authenticate, login
+# from django.shortcuts import render, redirect
+# from django.http import HttpResponse
+# from django.template import Template, Context
+# from django.middleware.csrf import get_token
 
-    csrf_token = get_token(request)
+# def custom_login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
 
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Login</title>
-    </head>
-    <body>
-        <h2>Login</h2>
-        {'<p style="color:red;">' + error_message + '</p>' if error_message else ''}
-        <form method="post">
-            <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
-            <p><label>Username:</label><input type="text" name="username" required></p>
-            <p><label>Password:</label><input type="password" name="password" required></p>
-            <button type="submit">Login</button>
-        </form>
-    </body>
-    </html>
-    """
-    return HttpResponse(html_content)
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             login(request, user)
+#             next_url = request.GET.get('next', '/')
+#             return redirect(next_url)
+#         else:
+#             error_message = "Invalid username or password"
+#     else:
+#         error_message = None
+
+#     csrf_token = get_token(request)
+
+#     html_content = f"""
+#     <!DOCTYPE html>
+#     <html>
+#     <head>
+#         <title>Login</title>
+#     </head>
+#     <body>
+#         <h2>Login</h2>
+#         {'<p style="color:red;">' + error_message + '</p>' if error_message else ''}
+#         <form method="post">
+#             <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
+#             <p><label>Username:</label><input type="text" name="username" required></p>
+#             <p><label>Password:</label><input type="password" name="password" required></p>
+#             <button type="submit">Login</button>
+#         </form>
+#     </body>
+#     </html>
+#     """
+#     return HttpResponse(html_content)
